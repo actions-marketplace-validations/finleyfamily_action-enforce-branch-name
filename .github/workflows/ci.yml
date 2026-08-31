@@ -7,7 +7,7 @@ on:
       - master
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '26'
 
 permissions:
   contents: read
@@ -16,16 +16,14 @@ jobs:
   spellcheck:
     name: spellcheck
     uses: finleyfamily/workflows/.github/workflows/spellcheck.yml@master
-    with:
-      node-version: '20'
   test-typescript:
     name: TypeScript Tests
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: 🏗 Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           cache: npm
           node-version: ${{ env.NODE_VERSION }}
@@ -35,9 +33,9 @@ jobs:
             MAKEFILE_LIST="$(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')"
           fi
 
-          if [[ -f "Makefile" ]] && [[ " ${MAKEFILE_LIST[*]} " =~ setup-npm ]]; then
+          if [[ -f "Makefile" ]] && [[ " ${MAKEFILE_LIST[*]} " =~ setup.npm ]]; then
             echo "installing node dependencies using Makefile...";
-            make setup-npm;
+            make setup.npm;
           elif [[ -f "package-lock.json" ]]; then
             echo "installing node dependencies using pipeline";
             npm ci;

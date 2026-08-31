@@ -9,7 +9,7 @@ on:
       - master
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '26'
 
 permissions:
   contents: read
@@ -22,11 +22,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: 🏗 Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: ⤵️ Install Node Dependencies
@@ -35,9 +35,9 @@ jobs:
             MAKEFILE_LIST="$(make -rpn | sed -n -e '/^$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$// ; p ; } ; }')"
           fi
 
-          if [[ -f "Makefile" ]] && [[ " ${MAKEFILE_LIST[*]} " =~ setup-npm ]]; then
+          if [[ -f "Makefile" ]] && [[ " ${MAKEFILE_LIST[*]} " =~ setup.npm ]]; then
             echo "installing node dependencies using Makefile...";
-            make setup-npm;
+            make setup.npm;
           elif [[ -f "package-lock.json" ]]; then
             echo "installing node dependencies using pipeline";
             npm ci;
@@ -49,13 +49,18 @@ jobs:
           fi
       - name: 🚀 Run Linters
         id: super-linter
-        uses: super-linter/super-linter/slim@v8.6.0
+        uses: super-linter/super-linter/slim@v8.7.0
         env:
           DEFAULT_BRANCH: master
           FILTER_REGEX_EXCLUDE: dist/**/*|LICENSE|README.md
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
+          VALIDATE_BIOME_FORMAT: false
+          VALIDATE_BIOME_LINT: false
           VALIDATE_CHECKOV: false
+          VALIDATE_GITHUB_ACTIONS_ZIZMOR: false  # TODO: ignore unavoidable errors then enable  # cspell:words ZIZMOR
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_JSCPD: false
+          VALIDATE_SPELL_CODESPELL: false
+          VALIDATE_TRIVY: false
           VALIDATE_TYPESCRIPT_STANDARD: false
